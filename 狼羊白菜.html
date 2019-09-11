@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<body>
+		
+	</body>
+	<script>
+		//构件图
+function G() {
+	this.verNum = 0; //顶点数
+	this.edges = 0; 
+	this.adj = []; 
+	this.ver = [{}];
+	//生成安全节点
+	for(var i = 0;i <= 1; i++){
+	for(var j = 0;j <= 1; j++){
+		for(var k = 0;k <= 1; k++){
+			for(var l = 0;l <= 1; l++){
+				if(!isSafe(i, j, k, l))
+					continue;
+				this.ver[this.verNum++] = {
+					farmer: i,
+					wolf: j,
+					sheep: k,
+					veg: l
+				};
+			}
+		}
+	}
+	}
+	for (var i = 0; i < this.verNum; ++i) { 
+		this.adj[i] = []; 
+		this.adj[i].push("");
+	}
+	this.addEdge = addEdge; 
+	//this.status = status;
+	this.showG = showG; 
+	//this.dfs = dfs;  
+	this.marked = []; 
+	for (var i = 0; i < this.verNum; ++i) { 
+		this.marked[i] = false; 
+	} 
+}
+
+
+//安全函数
+function isSafe(farmer, wolf, sheep, veg){
+ 	if(farmer != sheep && (wolf == sheep || sheep == veg)){    
+		return false;
+	}
+  	else{      
+		return true;
+	}
+}
+
+
+function addEdge(v, w){
+	this.adj[v].push(w); 
+	this.adj[w].push(v); 
+	this.edges++; 
+}
+
+//打印图
+function showG() { 
+	for (var i = 0; i < this.verNum; ++i) { 
+		putstr(i + " . "); 
+		for (var j = 0; j < this.verNum; ++j) { 
+			if (this.adj[i][j] != undefined) 
+				putstr(this.adj[i][j] + ' '); 
+		}
+	} 
+}
+
+//判断是否能过河,即是否可生成边
+function isAble(i, j){
+	if(G.ver[i].farmer == 1 && G.ver[i].veg == 1 && G.ver[j].farmer == 0 && G.ver[j].veg == 0)
+		return false;
+	var num = 0;
+	if(G.ver[i].wolf != G.ver[j].wolf) num++;
+	if(G.ver[i].sheep != G.ver[j].sheep) num++;
+	if(G.ver[i].veg != G.ver[j].veg) num++;
+	if(G.ver[i].farmer != G.ver[j].farmer && num <= 1)
+		return true;
+	else
+		return false;
+}
+
+
+//定位函数
+function locate(farmer, wolf, sheep, veg)
+{
+  for(var i = 0; i < G.verNum; i++){
+   if(G.ver[i].farmer == farmer && G.ver[i].wolf == wolf && G.ver[i].sheep == sheep && G.ver[i].veg == veg)
+	return i;
+   }
+   return -1;
+}
+var retPath = [];
+var flag = 0;
+
+//深度优先遍历出路径,此处仅能遍历一条路径
+function dfsPath(start, end){
+  var i = 0;
+  G.marked[start] = true;  
+  if (start == end)   {
+		retPath[flag] = end;
+		return;
+	}
+  for (i = 0; i < G.verNum; i++){
+    if (G.adj[start][i] && ! G.marked[i]){
+     retPath[flag++] = start;
+     dfsPath(i, end);   //递归调用遍历边上的节点
+    }
+	if(G.marked[end] == true)
+		break;
+  }
+}
+
+
+function judgement(state)
+{
+    if(state == 0)  return "左岸";
+    else return  "右岸";
+}
+
+//打印结果
+function print(start, end)
+{
+  var p = 0;
+  var i = start;
+  document.write("( 农夫        狼          羊        白菜 ) "+"<hr/>");
+  while(i != end){	 
+  	var l = "("+judgement(G.ver[i].farmer)+",  "+judgement(G.ver[i].wolf)+", "
+	+judgement(G.ver[i].sheep)+",  "+
+  	judgement(G.ver[i].veg)+")";
+   	i = retPath[++p];   
+	document.write(l+'<br/>'); 
+  }
+   var t = "("+judgement(G.ver[end].farmer)+",  "+
+   judgement(G.ver[end].wolf)+", "+judgement(G.ver[end].sheep)+",  "+
+   judgement(G.ver[end].veg)+")";
+   document.write(t+"<hr/>");
+}
+
+
+//main
+var G = new G();
+
+for (let i = 0; i < G.verNum; i++){
+   for (let j = 0; j < G.verNum; j++){
+	  G.adj[i][j] = 0;
+      if (isAble(i, j))      
+		G.adj[i][j] = G.adj[j][i] = 1;
+    }
+}
+var start = locate(0, 0, 0, 0);
+var end = locate(1, 1, 1, 1);
+dfsPath(start, end);
+if(G.marked[end]){
+	print(start, end);
+}
+console.log("就知道你会看控制台！")
+console.log("这里什么都没有！")
+	</script>
+</html>
